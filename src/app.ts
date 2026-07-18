@@ -9,7 +9,7 @@ app.use(cors({
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:3000",
-    "https://inventory-frontend-1kbrm89jr-totalstock1.vercel.app",
+    "https://inventory-frontend-wheat-theta.vercel.app",
     process.env.FRONTEND_URL || "",
   ],
   credentials: true,
