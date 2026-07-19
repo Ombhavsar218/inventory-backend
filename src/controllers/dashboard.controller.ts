@@ -58,7 +58,6 @@ export async function getDashboardStats(req: Request, res: Response): Promise<vo
           quantity: true,
           minStock: true,
           unit: true,
-          shop: { select: { id: true, name: true } },
         },
       }),
       prisma.bill.findMany({

@@ -44,7 +44,6 @@ model Shop {
   stateCode  String?
   ownerId    Int
   owner      User     @relation(fields: [ownerId], references: [id])
-  stockItems Stock[]
   bills      Bill[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -62,8 +61,6 @@ model Stock {
   gstRate     Float?
   minStock    Int        @default(0)
   description String?
-  shopId      Int?
-  shop        Shop?      @relation(fields: [shopId], references: [id])
   ownerId     Int
   owner       User       @relation(fields: [ownerId], references: [id])
   billItems   BillItem[]

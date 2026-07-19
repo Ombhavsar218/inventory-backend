@@ -11,7 +11,6 @@ export const stockSchema = z.object({
   gstRate: z.number().min(0).max(100).optional(),
   minStock: z.number().int().min(0, "Min stock must be 0 or more").optional(),
   description: z.string().optional(),
-  shopId: z.number().int().positive().optional(),
 });
 
 export type StockInput = z.infer<typeof stockSchema>;

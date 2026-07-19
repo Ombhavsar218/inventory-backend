@@ -14,14 +14,8 @@ export async function createStock(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const { name, sku, quantity, unit, price, mrp, hsnCode, gstRate, minStock, description, shopId } = result.data;
+    const { name, sku, quantity, unit, price, mrp, hsnCode, gstRate, minStock, description } = result.data;
     const userId = (req as any).userId;
-
-    const shop = await prisma.shop.findUnique({ where: { id: shopId } });
-    if (!shop) {
-      res.status(404).json({ success: false, message: "Shop not found" });
-      return;
-    }
 
     const stock = await prisma.stock.create({
       data: {
@@ -35,10 +29,8 @@ export async function createStock(req: Request, res: Response): Promise<void> {
         gstRate: gstRate ?? null,
         minStock: minStock ?? 0,
         description: description || null,
-        shopId,
         ownerId: userId,
       },
-      include: { shop: { select: { id: true, name: true } } },
     });
 
     res.status(201).json({ success: true, stock });
@@ -50,18 +42,7 @@ export async function createStock(req: Request, res: Response): Promise<void> {
 
 export async function getStocks(req: Request, res: Response): Promise<void> {
   try {
-    const userId = (req as any).userId;
-    const userRole = (req as any).userRole;
-    const { shopId } = req.query;
-
-    const where: any = {};
-    if (shopId) {
-      where.shopId = Number(shopId);
-    }
-
     const stocks = await prisma.stock.findMany({
-      where,
-      include: { shop: { select: { id: true, name: true } } },
       orderBy: { createdAt: "desc" },
     });
 
@@ -78,7 +59,6 @@ export async function getStockById(req: Request, res: Response): Promise<void> {
 
     const stock = await prisma.stock.findUnique({
       where: { id: Number(id) },
-      include: { shop: { select: { id: true, name: true } } },
     });
 
     if (!stock) {
@@ -115,7 +95,7 @@ export async function updateStock(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const { name, sku, quantity, unit, price, mrp, hsnCode, gstRate, minStock, description, shopId } = result.data;
+    const { name, sku, quantity, unit, price, mrp, hsnCode, gstRate, minStock, description } = result.data;
 
     const stock = await prisma.stock.update({
       where: { id: Number(id) },
@@ -130,9 +110,7 @@ export async function updateStock(req: Request, res: Response): Promise<void> {
         gstRate: gstRate ?? null,
         minStock: minStock ?? 0,
         description: description || null,
-        shopId,
       },
-      include: { shop: { select: { id: true, name: true } } },
     });
 
     res.status(200).json({ success: true, stock });
