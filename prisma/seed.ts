@@ -4,14 +4,31 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  const hashedPassword = await bcrypt.hash("password123", 12);
+
+  const superadmin = await prisma.user.findUnique({
+    where: { email: "superadmin@example.com" },
+  });
+  if (!superadmin) {
+    const user = await prisma.user.create({
+      data: {
+        fullName: "Super Admin",
+        email: "superadmin@example.com",
+        password: hashedPassword,
+        role: Role.SUPERADMIN,
+        isActive: true,
+      },
+    });
+    console.log("Super admin created:", { id: user.id, email: user.email, role: user.role });
+  } else {
+    console.log("Super admin already exists, skipping.");
+  }
+
   const existingOwner = await prisma.user.findUnique({
     where: { email: "owner@example.com" },
   });
-
   if (!existingOwner) {
-    const hashedPassword = await bcrypt.hash("password123", 12);
-
-    const owner = await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         fullName: "Admin Owner",
         email: "owner@example.com",
@@ -20,42 +37,36 @@ async function main() {
         isActive: true,
       },
     });
-
-    console.log("Default owner user created:", {
-      id: owner.id,
-      email: owner.email,
-      fullName: owner.fullName,
-      role: owner.role,
-    });
+    console.log("Owner created:", { id: user.id, email: user.email, role: user.role });
   } else {
-    console.log("Owner user already exists, skipping seed.");
+    console.log("Owner already exists, skipping.");
   }
 
-  const marketingUser = await prisma.user.findUnique({
-    where: { email: "marketing@example.com" },
-  });
+  const marketingUsers = [
+    { email: "marketing@example.com", fullName: "Marketing User" },
+    { email: "marketing1@example.com", fullName: "Marketing User 1" },
+    { email: "marketing2@example.com", fullName: "Marketing User 2" },
+    { email: "marketing3@example.com", fullName: "Marketing User 3" },
+    { email: "marketing4@example.com", fullName: "Marketing User 4" },
+    { email: "marketing5@example.com", fullName: "Marketing User 5" },
+  ];
 
-  if (!marketingUser) {
-    const hashedPassword = await bcrypt.hash("password123", 12);
-
-    const user = await prisma.user.create({
-      data: {
-        fullName: "Marketing User",
-        email: "marketing@example.com",
-        password: hashedPassword,
-        role: Role.MARKETING,
-        isActive: true,
-      },
-    });
-
-    console.log("Default marketing user created:", {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      role: user.role,
-    });
-  } else {
-    console.log("Marketing user already exists, skipping seed.");
+  for (const mu of marketingUsers) {
+    const existing = await prisma.user.findUnique({ where: { email: mu.email } });
+    if (!existing) {
+      const user = await prisma.user.create({
+        data: {
+          fullName: mu.fullName,
+          email: mu.email,
+          password: hashedPassword,
+          role: Role.MARKETING,
+          isActive: true,
+        },
+      });
+      console.log(`Marketing user created: ${user.email} (${user.role})`);
+    } else {
+      console.log(`${mu.email} already exists, skipping.`);
+    }
   }
 
   const existingProfile = await prisma.businessProfile.findFirst();
