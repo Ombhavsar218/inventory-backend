@@ -10,10 +10,13 @@ app.use(cors({
     "http://localhost:5174",
     "http://localhost:3000",
     "https://inventory-frontend-wheat-theta.vercel.app",
+    "https://inventory-frontend-294m8i6cr-totalstock1.vercel.app",
     process.env.FRONTEND_URL || "",
   ],
   credentials: true,
 }));
+
+app.options("*", cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
